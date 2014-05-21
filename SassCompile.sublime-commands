@@ -1,0 +1,18 @@
+[
+    {
+        "caption": "Sass Compile: Enable",
+        "command": "sass_compile_enable"
+    },
+    {
+        "caption": "Sass Compile: Enable Compile On Save",
+        "command": "sass_compile_enable_compile_on_save"
+    },
+    {
+        "caption": "Sass Compile: Disable Compile On Save",
+        "command": "sass_compile_disable_compile_on_save"
+    },
+    {
+        "caption": "Sass Compile: (File) Compile",
+        "command": "sass_compile_compile_file"
+    }
+]

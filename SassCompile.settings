@@ -1,0 +1,82 @@
+[
+    {
+        "name": "compile-on-save",
+        "type": "boolean",
+        "default": true,
+        "advanced": false,
+        "title": "Compile On Save",
+        "question": "Compile Sass files when they are saved?"
+    },
+    {
+        "name": "css-location",
+        "type": "text",
+        "default": "..",
+        "advanced": false,
+        "title": "Compiled CSS Location",
+        "question": "Where should compiled CSS files be saved to?"
+    },
+    {
+        "name": "style",
+        "type": [
+            "nested",
+            "compact",
+            "compressed",
+            "expanded"
+        ],
+        "default": "compressed",
+        "advanced": false,
+        "title": "Compilation Style",
+        "question": "How should the compiled CSS code be styled?"
+    },
+    {
+        "name": "syntax",
+        "type": [
+            "scss",
+            "sass"
+        ],
+        "default": "scss",
+        "advanced": true,
+        "title": "Sass Syntax",
+        "question": "Which Sass syntax would you like to compile?"
+    },
+    {
+        "name": "cache",
+        "type": "boolean",
+        "default": true,
+        "advanced": true,
+        "title": "Cache",
+        "question": "Cache Sass files for faster compiling?"
+    },
+    {
+        "name": "cache-location",
+        "type": "text",
+        "default": null,
+        "advanced": true,
+        "title": "Cache Location",
+        "question": "Where should the Sass cache be saved to?"
+    },
+    {
+        "name": "sourcemap",
+        "type": "boolean",
+        "default": false,
+        "advanced": true,
+        "title": "Development Sourcemaps",
+        "question": "Generate sourcemaps for development purposes?"
+    },
+    {
+        "name": "line-numbers",
+        "type": "boolean",
+        "default": false,
+        "advanced": true,
+        "title": "Line Numbers",
+        "question": "Generate line number comments in generated CSS files?"
+    },
+    {
+        "name": "debug-info",
+        "type": "boolean",
+        "default": false,
+        "advanced": true,
+        "title": "Debug Information",
+        "question": "Generate debug information to be used by external debuggers?"
+    }
+]

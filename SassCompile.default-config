@@ -1,0 +1,12 @@
+{
+    "enabled": true,
+    "compile-on-save": true,
+    "css-location": "..",
+    "style": "compressed",
+    "syntax": "scss",
+    "cache": true,
+    "cache-location": "",
+    "sourcemap": true,
+    "line-numbers": false,
+    "debug-info": false
+}
