@@ -187,7 +187,8 @@ def compile(filesToCompile, originalFile = None):
 
 class SassCompileEnableCommand(sublime_plugin.WindowCommand):
 	def run(self):
-		self.window.show_quick_panel(['Use Default Settings', 'Customize Settings (Basic)', 'Specify All Settings (Advanced)'], self.on_select_initialize)
+		# self.window.show_quick_panel(['Use Default Settings', 'Customize Settings (Basic)', 'Specify All Settings (Advanced)'], self.on_select_initialize)
+		self.on_select_initialize(0)
 
 	def on_select_initialize(self, selectedIndex):
 		if selectedIndex == 0:
