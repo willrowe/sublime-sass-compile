@@ -7,8 +7,9 @@ from subprocess import PIPE, Popen
 
 dirtyFiles = []
 pluginSettings = None
-defaultPluginSettings = None
+defaultPluginProjectSettings = None
 pluginPath = None
+upgradeCheckCompleted = False
 
 def getPluginPath(appendPath = None):
 	global pluginPath
@@ -36,21 +37,21 @@ def wasDirty(filePath):
 def getPluginSettings():
 	global pluginSettings
 	if not pluginSettings:
-		with open(getPluginPath('SassCompile.settings')) as settingsFile:
-			pluginSettings = json.load(settingsFile)
+		with open(getPluginPath('SassCompile.settings')) as pluginSettingsFile:
+			pluginSettings = json.load(pluginSettingsFile)
 	return pluginSettings
 
-def getDefaultPluginSettings():
-	global defaultPluginSettings
-	if not defaultPluginSettings:
-		defaultPluginSettings = {}
+def getDefaultPluginProjectSettings():
+	global defaultPluginProjectSettings
+	if not defaultPluginProjectSettings:
+		defaultPluginProjectSettings = {}
 		for setting in getPluginSettings():
-			defaultPluginSettings[setting['name']] = setting['default']
+			defaultPluginProjectSettings[setting['name']] = setting['default']
 
-	return defaultPluginSettings
+	return defaultPluginProjectSettings
 
-def getDefaultSettings():
-	defaultSettings = getDefaultPluginSettings()
+def getDefaultProjectSettings():
+	defaultProjectSettings = getDefaultPluginProjectSettings()
 
 	userDefaultSettingsPath = getPluginPath('SassCompile.default-config')
 	if os.path.isfile(userDefaultSettingsPath):
@@ -58,15 +59,17 @@ def getDefaultSettings():
 			userDefaultSettings = json.load(userDefaultSettingsFile)
 
 		for settingName, defaultValue in userDefaultSettings.items():
-			defaultSettings[settingName] = defaultValue
-	else:
+			if settingName in defaultProjectSettings:
+				defaultProjectSettings[settingName] = defaultValue
+	
+	if not userDefaultSettings or set(userDefaultSettings) - set(defaultProjectSettings):
 		with open(userDefaultSettingsPath, 'w') as userDefaultSettingsFile:
-			json.dump(defaultPluginSettings, userDefaultSettingsFile)
+			json.dump(defaultProjectSettings, userDefaultSettingsFile, indent=4)
 
-	return defaultSettings
+	return defaultProjectSettings
 
 def initializeDefaultProjectSettings(promptForSettings = False):
-	initialSettings = getDefaultSettings()
+	initialSettings = getDefaultProjectSettings()
 
 	if promptForSettings:
 		for setting in getPluginSettings():
@@ -81,6 +84,8 @@ def initializeDefaultProjectSettings(promptForSettings = False):
 def getProjectSetting(name = None):
 	projectData = sublime.active_window().project_data()
 	
+	upgradeProjectSettings(projectData['settings']['sasscompile'])
+
 	if name != None:
 		return projectData['settings']['sasscompile'][name]
 
@@ -90,7 +95,9 @@ def setProjectSetting(name, value = None):
 	projectData = sublime.active_window().project_data()
 
 	if 'settings' not in projectData:
-		projectData['settings'] = {'sasscompile': {}}
+		projectData['settings'] = {}
+	if 'sasscompile' not in projectData['settings']:
+		projectData['settings']['sasscompile'] = {}
 
 	if value != None:
 		projectData['settings']['sasscompile'][name] = value
@@ -98,6 +105,17 @@ def setProjectSetting(name, value = None):
 		projectData['settings']['sasscompile'] = name
 
 	sublime.active_window().set_project_data(projectData)
+
+def upgradeProjectSettings(projectSettings):
+	global upgradeCheckCompleted
+	if not upgradeCheckCompleted:
+		defaultProjectSettings = getDefaultProjectSettings()
+		if set(projectSettings) - set(defaultProjectSettings):
+	 		for setting in defaultProjectSettings:
+	 			defaultProjectSettings[setting] = projectSettings[setting]
+	 		setProjectSetting(projectSettings)
+	upgradeCheckCompleted = True
+
 
 def projectSettingsInitialized():
 	if sublime.active_window().project_file_name():
@@ -138,11 +156,11 @@ def getImportParents(filePath):
 	
 	return files
 
-def compileOnThread(filesToCompile, originalFile = None):
+def compileOnThread(filesToCompile, originalFile):
 	compileThread = Thread(target=compile, args=(filesToCompile, originalFile))
 	compileThread.start()
 
-def compile(filesToCompile, originalFile = None):
+def compile(filesToCompile, originalFile):
 	compiled_files = []
 	filesToCompile = list(set(filesToCompile))
 	for filePath in filesToCompile:
@@ -218,7 +236,7 @@ class SassCompileDisableCompileOnSaveCommand(sublime_plugin.WindowCommand):
 
 class SassCompileCompileFileCommand(sublime_plugin.WindowCommand):
 	def run(self):
-		compileOnThread(getFilesToCompile(self.window.active_view().file_name()))
+		compileOnThread(getFilesToCompile(self.window.active_view().file_name()), self.window.active_view().file_name())
 
 	def is_visible(self):
 		return projectSettingsInitialized() and isSassFile(self.window.active_view().file_name())
