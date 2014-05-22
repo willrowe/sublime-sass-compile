@@ -51,7 +51,7 @@ def getPluginSettings():
 	if not pluginSettings:
 		pluginSettings = sublime.load_settings('SassCompile.sublime-settings')
 
-	return pluginSettings.copy()
+	return pluginSettings
 
 def getPluginProjectSettings():
 	global pluginProjectSettings
@@ -83,7 +83,6 @@ def getDefaultProjectSettings():
 				defaultProjectSettings[settingName] = defaultValue
 	
 	if not userDefaultSettings or set(userDefaultSettings) ^ set(defaultProjectSettings):
-		print(defaultProjectSettings)
 		with open(userDefaultSettingsPath, 'w') as userDefaultSettingsFile:
 			json.dump(defaultProjectSettings, userDefaultSettingsFile, indent=4)
 
@@ -118,7 +117,7 @@ def getProjectSetting(name = None):
 	if name != None:
 		return projectData['settings']['sasscompile'][name]
 
-	return projectData['settings']['sasscompile'].deepcopy()
+	return projectData['settings']['sasscompile'].copy()
 
 def setProjectSetting(name, value = None):
 	projectData = sublime.active_window().project_data()
@@ -221,9 +220,8 @@ def compile(filesToCompile, originalFile):
 		if err:
 			logError(err)
 			return
-
-		if out:
-			compiled_files.append(filePath)
+			
+		compiled_files.append(filePath)
 
 		
 	sublime.status_message('{0} SASS file(s) compiled.'.format(len(compiled_files)))
