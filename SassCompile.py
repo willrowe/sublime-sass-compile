@@ -7,6 +7,7 @@ from subprocess import PIPE, Popen
 
 dirtyFiles = []
 pluginSettings = None
+pluginProjectSettings = None
 defaultPluginProjectSettings = None
 pluginPath = None
 upgradeCheckCompleted = False
@@ -37,15 +38,22 @@ def wasDirty(filePath):
 def getPluginSettings():
 	global pluginSettings
 	if not pluginSettings:
-		with open(getPluginPath('SassCompile.settings')) as pluginSettingsFile:
-			pluginSettings = json.load(pluginSettingsFile)
+		pluginSettings = sublime.load_settings('SassCompile.sublime-settings')
+
 	return pluginSettings
+
+def getPluginProjectSettings():
+	global pluginProjectSettings
+	if not pluginProjectSettings:
+		with open(getPluginPath('SassCompile.settings')) as pluginProjectSettingsFile:
+			pluginProjectSettings = json.load(pluginProjectSettingsFile)
+	return pluginProjectSettings
 
 def getDefaultPluginProjectSettings():
 	global defaultPluginProjectSettings
 	if not defaultPluginProjectSettings:
 		defaultPluginProjectSettings = {}
-		for setting in getPluginSettings():
+		for setting in getPluginProjectSettings():
 			defaultPluginProjectSettings[setting['name']] = setting['default']
 
 	return defaultPluginProjectSettings
@@ -72,7 +80,7 @@ def initializeDefaultProjectSettings(promptForSettings = False):
 	initialSettings = getDefaultProjectSettings()
 
 	if promptForSettings:
-		for setting in getPluginSettings():
+		for setting in getPluginProjectSettings():
 			if (promptForSettings == 1 and not setting['advanced']) or promptForSettings == 2:
 				if setting['type'] == 'boolean' or type(setting['type']) is list:
 					print(setting['title'])
@@ -116,7 +124,6 @@ def upgradeProjectSettings(projectSettings):
 					defaultProjectSettings[setting] = projectSettings[setting]
 			setProjectSetting(defaultProjectSettings)
 	upgradeCheckCompleted = True
-
 
 def projectSettingsInitialized():
 	if sublime.active_window().project_file_name():
@@ -187,7 +194,7 @@ def compile(filesToCompile, originalFile):
 		if settings['sourcemap']:
 			rules.append('--sourcemap')
 
-		cmd = 'sass {0} \'{1}\' \'{2}\''.format(' '.join(rules), filePath, compilePath)
+		cmd = '{0} {1} \'{2}\' \'{3}\''.format(getPluginSettings().get('sass_path'), ' '.join(rules), filePath, compilePath)
 		proc = Popen(cmd, shell=True, cwd=os.path.dirname(filePath), stdout=PIPE, stderr=PIPE)
 		out, err = proc.communicate()
 		if err:
