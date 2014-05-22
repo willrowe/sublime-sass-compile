@@ -102,6 +102,14 @@ def initializeDefaultProjectSettings(promptForSettings = False):
 		
 	setProjectSetting(initialSettings)
 
+def deinitializeProjectSettings():
+	projectData = sublime.active_window().project_data()
+	projectData['settings'].pop('sasscompile')
+	if len(projectData['settings']) == 0:
+		projectData.pop('settings')
+
+	sublime.active_window().set_project_data(projectData)
+
 def getProjectSetting(name = None):
 	projectData = sublime.active_window().project_data()
 	
@@ -240,6 +248,13 @@ class SassCompileEnableCommand(sublime_plugin.WindowCommand):
 
 	def is_visible(self):
 		return not projectSettingsInitialized()
+
+class SassCompileDisableCommand(sublime_plugin.WindowCommand):
+	def run(self):
+		deinitializeProjectSettings()
+
+	def is_visible(self):
+		return projectSettingsInitialized()
 
 class SassCompileEnableCompileOnSaveCommand(sublime_plugin.WindowCommand):
 	def run(self):

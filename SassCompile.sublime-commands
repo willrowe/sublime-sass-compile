@@ -1,7 +1,11 @@
 [
     {
-        "caption": "Sass Compile: Enable",
+        "caption": "Sass Compile: (Project) Enable",
         "command": "sass_compile_enable"
+    },
+    {
+        "caption": "Sass Compile: (Project) Disable",
+        "command": "sass_compile_disable"
     },
     {
         "caption": "Sass Compile: Enable Compile On Save",
