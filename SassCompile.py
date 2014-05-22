@@ -10,6 +10,7 @@ pluginSettings = None
 pluginProjectSettings = None
 defaultPluginProjectSettings = None
 pluginPath = None
+userPath = None
 upgradeCheckCompleted = False
 
 def getPluginPath(appendPath = None):
@@ -20,6 +21,16 @@ def getPluginPath(appendPath = None):
 	if appendPath:
 		return os.sep.join([pluginPath, appendPath])
 	return pluginPath
+
+def getUserPath(appendPath = None):
+	global userPath
+	if not userPath:
+		userPath = os.sep.join([os.path.dirname(getPluginPath()), 'User'])
+
+	if appendPath:
+		return os.sep.join([userPath, appendPath])
+
+	return userPath
 
 def logError(errorMessage):
 	# outputPanel = sublime.active_window().create_output_panel('sasscompile')
@@ -40,14 +51,14 @@ def getPluginSettings():
 	if not pluginSettings:
 		pluginSettings = sublime.load_settings('SassCompile.sublime-settings')
 
-	return pluginSettings
+	return pluginSettings.copy()
 
 def getPluginProjectSettings():
 	global pluginProjectSettings
 	if not pluginProjectSettings:
 		with open(getPluginPath('SassCompile.settings')) as pluginProjectSettingsFile:
 			pluginProjectSettings = json.load(pluginProjectSettingsFile)
-	return pluginProjectSettings
+	return pluginProjectSettings.copy()
 
 def getDefaultPluginProjectSettings():
 	global defaultPluginProjectSettings
@@ -56,12 +67,13 @@ def getDefaultPluginProjectSettings():
 		for setting in getPluginProjectSettings():
 			defaultPluginProjectSettings[setting['name']] = setting['default']
 
-	return defaultPluginProjectSettings
+	return defaultPluginProjectSettings.copy()
 
 def getDefaultProjectSettings():
 	defaultProjectSettings = getDefaultPluginProjectSettings()
-
-	userDefaultSettingsPath = getPluginPath('SassCompile.default-config')
+	
+	userDefaultSettingsPath = getUserPath('SassCompile.default-config')
+	userDefaultSettings = None
 	if os.path.isfile(userDefaultSettingsPath):
 		with open(userDefaultSettingsPath) as userDefaultSettingsFile:
 			userDefaultSettings = json.load(userDefaultSettingsFile)
@@ -71,6 +83,7 @@ def getDefaultProjectSettings():
 				defaultProjectSettings[settingName] = defaultValue
 	
 	if not userDefaultSettings or set(userDefaultSettings) ^ set(defaultProjectSettings):
+		print(defaultProjectSettings)
 		with open(userDefaultSettingsPath, 'w') as userDefaultSettingsFile:
 			json.dump(defaultProjectSettings, userDefaultSettingsFile, indent=4)
 
@@ -97,7 +110,7 @@ def getProjectSetting(name = None):
 	if name != None:
 		return projectData['settings']['sasscompile'][name]
 
-	return projectData['settings']['sasscompile']
+	return projectData['settings']['sasscompile'].deepcopy()
 
 def setProjectSetting(name, value = None):
 	projectData = sublime.active_window().project_data()
@@ -257,3 +270,8 @@ class SassCompileCommand(sublime_plugin.EventListener):
 	def on_post_save(self, view):
 		if projectSettingsInitialized() and getProjectSetting('compile-on-save') and isSassFile(view.file_name()) and wasDirty(view.file_name()):
 			compileOnThread(getFilesToCompile(view.file_name()), view.file_name())
+
+class SassCompileOpenDefaultConfig(sublime_plugin.WindowCommand):
+	def run(self):
+		getDefaultProjectSettings()
+		self.window.open_file(getUserPath('SassCompile.default-config'))

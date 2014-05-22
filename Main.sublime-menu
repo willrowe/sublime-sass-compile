@@ -16,14 +16,21 @@
                         "children":
                         [
                             {
+                                "caption": "Settings – Default",
                                 "command": "open_file",
-                                "args": {"file": "${packages}/Sass Compile/SassCompile.sublime-settings"},
-                                "caption": "Settings – Default"
+                                "args": {"file": "${packages}/Sass Compile/SassCompile.sublime-settings"}
                             },
                             {
+                                "caption": "Settings – User",
                                 "command": "open_file",
-                                "args": {"file": "${packages}/User/Sass Compile/SassCompile.sublime-settings"},
-                                "caption": "Settings – User"
+                                "args": {"file": "${packages}/User/SassCompile.sublime-settings"}
+                            },
+                            {
+                                "caption": "-"
+                            },
+                            {
+                                "caption": "Default Project Settings – User",
+                                "command": "sass_compile_open_default_config"
                             }
                         ]
                     }
