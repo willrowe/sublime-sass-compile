@@ -62,7 +62,7 @@ def getDefaultProjectSettings():
 			if settingName in defaultProjectSettings:
 				defaultProjectSettings[settingName] = defaultValue
 	
-	if not userDefaultSettings or set(userDefaultSettings) - set(defaultProjectSettings):
+	if not userDefaultSettings or set(userDefaultSettings) ^ set(defaultProjectSettings):
 		with open(userDefaultSettingsPath, 'w') as userDefaultSettingsFile:
 			json.dump(defaultProjectSettings, userDefaultSettingsFile, indent=4)
 
@@ -110,10 +110,11 @@ def upgradeProjectSettings(projectSettings):
 	global upgradeCheckCompleted
 	if not upgradeCheckCompleted:
 		defaultProjectSettings = getDefaultProjectSettings()
-		if set(projectSettings) - set(defaultProjectSettings):
-	 		for setting in defaultProjectSettings:
-	 			defaultProjectSettings[setting] = projectSettings[setting]
-	 		setProjectSetting(projectSettings)
+		if set(projectSettings) ^ set(defaultProjectSettings):
+			for setting in defaultProjectSettings:
+				if setting in projectSettings:
+					defaultProjectSettings[setting] = projectSettings[setting]
+			setProjectSetting(defaultProjectSettings)
 	upgradeCheckCompleted = True
 
 
@@ -199,7 +200,7 @@ def compile(filesToCompile, originalFile):
 		
 	sublime.status_message('{0} SASS file(s) compiled.'.format(len(compiled_files)))
 
-	if originalFile:
+	if originalFile in dirtyFiles:
 		dirtyFiles.remove(originalFile)
 
 
