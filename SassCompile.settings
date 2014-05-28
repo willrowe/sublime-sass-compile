@@ -53,7 +53,7 @@
         "default": null,
         "advanced": true,
         "title": "Cache Location",
-        "question": "Where should the Sass cache be saved to?"
+        "question": "Where should the Sass cache be saved to? A blank value will store the cache in it's default location."
     },
     {
         "name": "sourcemap",
