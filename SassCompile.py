@@ -55,22 +55,27 @@ def getPluginSettings():
 
 	return pluginSettings
 
-def getPluginProjectSettings():
+def getPluginProjectSettings(useUserDefaults = False):
 	global pluginProjectSettings
 	if not pluginProjectSettings:
 		with open(getPluginPath("SassCompile.settings")) as pluginProjectSettingsFile:
 			pluginProjectSettings = json.load(pluginProjectSettingsFile)
+	
+	if useUserDefaults:
+		defaultProjectSettings = getDefaultProjectSettings()
+		for setting in pluginProjectSettings:
+			setting["default"] = defaultProjectSettings[setting["name"]]
 	return pluginProjectSettings.copy()
 
-def getBasicPluginProjectSettings():
+def getBasicPluginProjectSettings(useUserDefaults = False):
 	global basicPluginProjectSettings
 	if not basicPluginProjectSettings:
 		basicPluginProjectSettings = []
-		for setting in getPluginProjectSettings():
+		for setting in getPluginProjectSettings(useUserDefaults):
 			if not setting["advanced"]:
 				basicPluginProjectSettings.append(setting)
 
-	return basicPluginProjectSettings
+	return basicPluginProjectSettings.copy()
 
 def getDefaultPluginProjectSettings():
 	global defaultPluginProjectSettings
@@ -102,12 +107,12 @@ def getDefaultProjectSettings():
 
 def initializeDefaultProjectSettings(promptLevel = 0):
 	if promptLevel == 0:
-		userInputDone()
+		initializationInputDone()
 	elif promptLevel > 0:
 		if promptLevel == 1:
-			promptSettings = getBasicPluginProjectSettings()
+			promptSettings = getBasicPluginProjectSettings(True)
 		elif promptLevel == 2:
-			promptSettings = getPluginProjectSettings()
+			promptSettings = getPluginProjectSettings(True)
 		
 		UserInputList(promptSettings, initializationInputDone, formatQuestionCallback)
 
@@ -117,6 +122,7 @@ def initializationInputDone(answers = None):
 		for name, answer in answers.items():
 			initialSettings[name] = answer
 	setProjectSetting(initialSettings)
+	sublime.status_message("Sass Compile is now enabled for this project.")
 
 def formatQuestionCallback(question, type):
 	if type == UserInputList.QUICK_PANEL:
@@ -131,6 +137,7 @@ def deinitializeProjectSettings():
 		projectData.pop("settings")
 
 	sublime.active_window().set_project_data(projectData)
+	sublime.status_message("Sass Compile has been disabled for this project.")
 
 def getProjectSetting(name = None):
 	projectData = sublime.active_window().project_data()
@@ -303,7 +310,6 @@ class SassCompileOpenDefaultConfig(sublime_plugin.WindowCommand):
 		getDefaultProjectSettings()
 		self.window.open_file(getUserPath("SassCompile.default-config"))
 
-
 class UserInputList():
 	QUICK_PANEL = 0
 	INPUT_PANEL = 1
@@ -332,7 +338,7 @@ class UserInputList():
 				else:
 					choices = [currentQuestion["question"]]
 				if currentQuestion["type"] == "boolean":
-					choices.extend(["Yes", "No"])	
+					choices.extend(["Yes", "No"])
 					if currentQuestion["default"] == True:
 						defaultIndex = 1
 					else:
