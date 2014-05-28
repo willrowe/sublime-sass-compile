@@ -28,7 +28,7 @@ Installation
 1.  Quit Sublime Text 3
 2.  If you already have **Sass Compile** installed, navigate to the packages directory and delete the `Sass Compile` directory.  
     *All user settings will be preserved*
-3.  Either clone this GithHub repository into the packages directory or download a ZIP file and unzip it into the packages directory.
+3.  Either clone this GithHub repository into the packages directory or download a ZIP file and unzip it into the packages directory. Stable releases are tagged, it is recommended to use one of them for best results.
 4.  Rename the cloned or unzipped directory to `Sass Compile`
 5.  Open Sublime Text 3 and start using **Sass Compile**!
 
@@ -36,11 +36,16 @@ Installation
 
 Usage
 -----
-___Please note that in order to use this plugin, it may only be used in an open project with a saved `*.sublime-project` file.___  
-___This functionality may be changed in the future depending on how users are utilizing the plugin and what their needs are.___
+___Please note that this plugin may only be used in an open project with a saved `*.sublime-project` file.___  
+___This functionality may change in the future depending on how users are utilizing the plugin and what their needs are.___
 ###Enabling *Sass Compile* On A Project###
-Open the Command Palette and run the command `Sass Compile: (Project) Enable`.  
-This will insert the default settings into the `*.sublime-project` file.
+1.  Open the Command Palette and run the command `Sass Compile: (Project) Enable`.
+2.  You will be prompted with three choices:
+    -   `Use Default Settings` - All settings will be taken from the preset project defaults.
+    -   `Customize Settings (Basic)` - You will be prompted to choose the values for the basic settings in the **Project Specific Settings** section below.
+    -   `Specify All Settings (Advanced)` - You will be prompted to choose the values for all the settings in the **Project Specific Settings** section below.
+3.  Choose the level of control you want to have over the settings and it will guide you through setting up the project settings.
+4.  All the chosen settings will be inserted into the `*.sublime-project` file.
 
 ###Toggling Compile On Save###
 If **Sass Compile** has been enabled for the project, open the Command Palette and run either:  
@@ -125,14 +130,18 @@ These settings are generated automatically and placed in the project file. Direc
 
 When enabling **Sass Compile** on a project for the first time, it will initialize the settings to the defaults specified below. You may override these defaults with your own set of defaults. Directions on how to do so can be found in the **Usage** section above.
 
-*Settings are displayed in the format: `setting-name`:`default-value`*
+*Settings are displayed in the format: `setting-name`:`default-value`*  
+
+***Basic Settings***
 -   `compile-on-save`:`true` - Whether Sass files will be compiled when they are saved.
 -   `css-location`:`..` - Where the compiled CSS files should be stored. This can be an absolute or relative path. Relative paths are relative to the Sass file being compiled when started with `.` or `..`  
     *There are plans to add the ability to specify a path relative to the project directory.*
 -   `style`:`compressed` - What formatting style should be used when compiling the CSS files.  
     Currently supported styles:
     `nested`, `compact`, `compressed`, and `expanded`  
-    *For explanations of what these styles mean, please read the [Sass output style reference](http://sass-lang.com/documentation/file.SASS_REFERENCE.html#output_style)*
+    *For explanations of what these styles mean, please read the [Sass output style reference](http://sass-lang.com/documentation/file.SASS_REFERENCE.html#output_style)*  
+
+***Advanced Settings***
 -   `syntax`:`scss` - Which syntax to compile from. This also determines the file type that can be compiled either manually or automatically.  
     Currently supported syntaxes:
     `scss` and `sass`
@@ -142,11 +151,15 @@ When enabling **Sass Compile** on a project for the first time, it will initiali
 -   `line-numbers`:`false` - Whether line numbers will be generated for use with development.
 -   `debug-info`:`false` - Whether debug information will be generated for use by external debuggers.
 
-Notes
------
--   Compatibility
-    -   Mac OS X
-    -   Sublime Text 3
+Release Notes
+-------------
+-   v0.1.0 - Initial launch
+-   v0.2.0 - User prompts added for enabling **Sass Compile** on a project
+
+Compatibility
+-------------
+-   Mac OS X
+-   Sublime Text 3
 
 License
 -------
