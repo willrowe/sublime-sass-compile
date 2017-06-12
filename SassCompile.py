@@ -19,7 +19,7 @@ def getPluginPath(appendPath = None):
 	global pluginPath
 	if not pluginPath:
 		pluginPath = os.path.dirname(__file__);
-	
+
 	if appendPath:
 		return os.sep.join([pluginPath, appendPath])
 	return pluginPath
@@ -60,7 +60,7 @@ def getPluginProjectSettings(useUserDefaults = False):
 	if not pluginProjectSettings:
 		with open(getPluginPath("SassCompile.settings")) as pluginProjectSettingsFile:
 			pluginProjectSettings = json.load(pluginProjectSettingsFile)
-	
+
 	if useUserDefaults:
 		defaultProjectSettings = getDefaultProjectSettings()
 		for setting in pluginProjectSettings:
@@ -88,7 +88,7 @@ def getDefaultPluginProjectSettings():
 
 def getDefaultProjectSettings():
 	defaultProjectSettings = getDefaultPluginProjectSettings()
-	
+
 	userDefaultSettingsPath = getUserPath("SassCompile.default-config")
 	userDefaultSettings = None
 	if os.path.isfile(userDefaultSettingsPath):
@@ -98,7 +98,7 @@ def getDefaultProjectSettings():
 		for settingName, defaultValue in userDefaultSettings.items():
 			if settingName in defaultProjectSettings:
 				defaultProjectSettings[settingName] = defaultValue
-	
+
 	if not userDefaultSettings or set(userDefaultSettings) ^ set(defaultProjectSettings):
 		with open(userDefaultSettingsPath, "w") as userDefaultSettingsFile:
 			json.dump(defaultProjectSettings, userDefaultSettingsFile, indent=4)
@@ -113,7 +113,7 @@ def initializeDefaultProjectSettings(promptLevel = 0):
 			promptSettings = getBasicPluginProjectSettings(True)
 		elif promptLevel == 2:
 			promptSettings = getPluginProjectSettings(True)
-		
+
 		UserInputList(promptSettings, initializationInputDone, formatQuestionCallback)
 
 def initializationInputDone(answers = None):
@@ -141,7 +141,7 @@ def deinitializeProjectSettings():
 
 def getProjectSetting(name = None):
 	projectData = sublime.active_window().project_data()
-	
+
 	upgradeProjectSettings(projectData["settings"]["sasscompile"])
 
 	if name != None:
@@ -211,7 +211,7 @@ def getImportParents(filePath):
 	for parentFileName in out.split():
 		if isSassFile(parentFileName):
 			files.extend(getFilesToCompile(os.sep.join([os.path.dirname(filePath), parentFileName])))
-	
+
 	return files
 
 def compileOnThread(filesToCompile, originalFile):
@@ -230,7 +230,7 @@ def compile(filesToCompile, originalFile):
 			compilePath = os.path.normpath(os.sep.join([os.path.dirname(filePath), settings["css-location"], compileName]))
 
 		rules = ["--trace", "--stop-on-error", "--style {0}".format(settings["style"])]
-		
+
 		if originalFile not in dirtyFiles:
 			rules.append("--force")
 		if not settings["cache"]:
@@ -241,8 +241,8 @@ def compile(filesToCompile, originalFile):
 			rules.append("--line-numbers")
 		if settings["cache-location"]:
 			rules.append("--cache-location \'{0}\'".format(settings["cache-location"]))
-		if settings["sourcemap"]:
-			rules.append("--sourcemap")
+		if not settings["sourcemap"]:
+			rules.append("--sourcemap=none")
 
 		cmd = "{0} {1} \'{2}\' \'{3}\'".format(getPluginSettings().get("sass_path"), " ".join(rules), filePath, compilePath)
 		proc = Popen(cmd, shell=True, cwd=os.path.dirname(filePath), stdout=PIPE, stderr=PIPE)
@@ -250,10 +250,10 @@ def compile(filesToCompile, originalFile):
 		if err:
 			logError(err)
 			return
-			
+
 		compiled_files.append(filePath)
 
-		
+
 	sublime.status_message("{0} SASS file(s) compiled.".format(len(compiled_files)))
 
 	if originalFile in dirtyFiles:

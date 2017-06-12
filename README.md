@@ -149,12 +149,14 @@ When enabling **Sass Compile** on a project for the first time, it will initiali
 -   `debug-info`:`false` - Whether debug information will be generated for use by external debuggers.
 
 ## Release Notes
--   v0.1.0 - Initial launch
--   v0.2.0 - User prompts added for enabling **Sass Compile** on a project
+- v0.1.0 - Initial launch
+- v0.2.0 - User prompts added for enabling **Sass Compile** on a project
+- v0.2.1 - Fixed [issue #1](https://github.com/willrowe/sublime-sass-compile/issues/1) that prevented source maps from being disabled.
 
 ## Compatibility
--   Mac OS X
--   Sublime Text 3
+*May work in other contexts, but only tested on the following.*
+- Mac OS X
+- Sublime Text 3
 
 ## License
 The **Sass Compile** plugin is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
